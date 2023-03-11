@@ -293,7 +293,7 @@ void main()
         if (K % 10000 == 0)
         {
             string Name = "ZR";
-            string FileT = to_string(K);
+            string FileT = to_string((int)(K / 10000));
             string TXT = "msec.txt";
             string FileName = Name + FileT + TXT;
             ofstream file;

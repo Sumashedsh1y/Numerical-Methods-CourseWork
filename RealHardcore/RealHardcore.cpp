@@ -118,7 +118,7 @@ void main()
     cout << "Arrays are full" << endl;
     cout << endl;
     double T, TZ2, TZ6;
-    double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
+    double P_0 = 5.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
     double V_liquid = 1e-6, ro_g = 1.2, ro_liq0 = 1000., yota = 1.4, lambda = 0.0256;
     double K_g = lambda / (c_g * ro_g);
     for (int I = 0; I <= M1; I++)
@@ -150,7 +150,6 @@ void main()
             RO[I][J] = alpha[I][J] * ro_g + (1 - alpha[I][J]) * ro_liq0;
             RO0[I][J] = alpha[I][J] * ro_g + (1 - alpha[I][J]) * ro_liq0;
             Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
-            if (Cb[I][J] > C_liq) { Cb[I][J] = C_liq; }
         }
     for (int I = 0; I <= M1; I++) { alpha[I][0] = alpha[I][1]; }
     T = 0.0;
@@ -158,7 +157,7 @@ void main()
     int numer = 1;
     int numer1 = 1;
     ofstream FileDeltaP_liq;
-    FileDeltaP_liq.open("PL-1-50-150-250-300-.txt");
+    FileDeltaP_liq.open("PL-1-50-100-150-200-250-300.txt");
     while (K <= 50000)
     {
         if ((ceil(K / 100) - numer1) == 0) { cout << "\n" << K; numer1++; }
@@ -216,7 +215,7 @@ void main()
             for (int J = 1; J <= M2 - 1; J++)
             {
                 T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (a0 * a0 * a0 * P_0);
-                W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
+                W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * Cb[I][J] * pow(alpha[I][J], 1 / 3));
                 W[I][J] = W_R[I][J] + W_A[I][J];
                 Pe[I][J] = 12. * (yota - 1.) * (T_0 * A[I][J] * fabs(W[I][J])) / (K_g * fabs(T_g[I][J] - (T_0 + 0.0000001)));
                 if (Pe[I][J] > 100.) { NU[I][J] = sqrt(Pe[I][J]); }
@@ -230,7 +229,7 @@ void main()
                 NEW_Z[M1][J] = Z[M1][J] + tau * (Vz[M1][J]);
                 NEW_R[I][M2] = R[I][M2] + tau * (Vr[I][M2]);
                 Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
-                if (Cb[I][J] > C_liq) { Cb[I][J] = C_liq; }
+
                 if (J == 1)
                 {
                     Jakobian[I][J] = (Z[I + 1][J] - Z[I][J]) / (hZ);
@@ -250,7 +249,7 @@ void main()
                 NEW_alpha[I][J] = alpha[I][J] + (tau * (3. * alpha[I][J] * W[I][J] / A[I][J] -
                     DJak[I][J] * alpha[I][J] / Jakobian[I][J]));
 
-                NEW_P_liq[I][J] = P_liq[I][J] + (tau * C_liq * C_liq * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
+                NEW_P_liq[I][J] = P_liq[I][J] + (tau * Cb[I][J] * Cb[I][J] * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
                     (RO0[I][J] / (RO[I][J] * Jakobian[I][J] * Jakobian[I][J]) + alpha[I][J] / Jakobian[I][J])) / (1 - alpha[I][J]));
                 // задание условия неотражения на границе z = Lz
                 NEW_P_liq[M1 - 1][J] = (Cb[I][J] * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
@@ -268,7 +267,6 @@ void main()
                 Z[I][J] = NEW_Z[I][J];
                 R[I][J] = NEW_R[I][J];
             }
-        FileDeltaP_liq << "\n" << K * tau << "\t" << (P_liq[1][1] - P_0) / P_0 << "\t" << (P_liq[50][1] - P_0) / P_0 << "\t" << (P_liq[150][1] - P_0) / P_0 << "\t" << (P_liq[250][1] - P_0) / P_0 << "\t" << (P_liq[300][1] - P_0) / P_0;
         for (int I = 0; I <= M1 - 1; I++) { P_liq[I][0] = P_liq[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
             for (int J = (0); J <= 2 * (M2); J++)
@@ -276,6 +274,7 @@ void main()
                 if (J <= (M2)) { Pz[I][J] = P_liq[I][(M2)-J]; }
                 else if (J >= (M2)) { Pz[I][J] = P_liq[I][J - (M2)]; }
             }
+        FileDeltaP_liq << "\n" << K * tau << "\t" << (Pz[1][50] - P_0) << "\t" << (Pz[50][50] - P_0) << "\t" << (Pz[100][50] - P_0) << "\t" << (Pz[150][50] - P_0) << "\t" << (Pz[200][50] - P_0) << "\t" << (Pz[250][50] - P_0) << "\t" << (Pz[299][50] - P_0);
         for (int I = 0; I <= M1 - 1; I++) { Vz[I][0] = Vz[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
             for (int J = (0); J <= 2 * (M2 - 1); J++)
@@ -301,7 +300,7 @@ void main()
             for (int I = 0; I < M1; I++)
                 for (int J = 1; J <= M2; J++)
                 {
-                    file << "\n" << I * hZ << "\t" << -((M2)-J) * hR << "\t" << (Pz[I][J] - P_0) / P_0;
+                    file << "\n" << I * hZ << "\t" << -((M2)-J) * hR << "\t" << Pz[I][J] - P_0;
                 }
             numer++;
         }

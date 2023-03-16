@@ -165,25 +165,20 @@ void main()
         double T = K * tau;
         double delta_P_liq = 5.e+5; // 0.5МПа
         T = K * tau;
-        double TZR1 = 2.0E-4;
-        double TZR2 = 5.0E-5 + TZR1;
-        double TZ1 = TZR1 / 2.0;
-        double TZ2 = TZR1 + (5.0E-5 / 2.0);
-        double ZN11 = 1.0 / (sqrt(4.0 * log(10.0)));
-        double ZN111 = TZ1 * ZN11;
-        double ZN112 = TZ2 * ZN11;
-
-        for (int J = 1; J <= M2; J++)
+        double TZR1 = 2.E-4;
+        double TZ = TZR1 / 2.;
+        double ZN11 = 1. / (sqrt(4.0 * log(10.)));
+        double ZN1 = TZ * ZN11;
+        if ((T < TZR1))
         {
-            if (T < TZR1 / 2.0)
+            for (int J = 0; J <= M2; J++)
             {
-                P_liq[0][J] = P_0 + delta_P_liq * exp(-((T - TZ1) / ZN111) * ((T - TZ1) / ZN111));
+                P_liq[0][J] = P_0 + delta_P_liq * exp(-((T - TZ) / (ZN1)) * ((T - TZ) / (ZN1)));
             }
-            else
-            {
-
-                P_liq[0][J] = P_0 + delta_P_liq;
-            }
+        }
+        else
+        {
+            for (int J = 0; J <= M2; J++) { P_liq[0][J] = P_0 + delta_P_liq; }
         }
         for (int I = 1; I <= M1 - 1; I++)
             for (int J = 1; J <= M2 - 1; J++)
@@ -269,12 +264,13 @@ void main()
             string FileName = Name + FileT + TXT;
             ofstream file;
             file.open(FileName);
-            for (int I = 0; I < M1; I++)
+            for (int I = 0; I < M1; I++) {
                 for (int J = 1; J <= M2; J++)
                 {
                     file << "\n" << I * hZ << "\t" << -((M2)-J) * hR << "\t" << Pz[I][J] - P_0;
+                    FileP_liq << K << "\t" << P_liq[0][J] << endl;
                 }
-            FileP_liq << K << "\t" << P_liq[0][0] << endl;
+            }
             numer++;
         }
         K++;

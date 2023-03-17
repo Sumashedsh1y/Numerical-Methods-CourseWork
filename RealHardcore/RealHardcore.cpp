@@ -5,14 +5,15 @@
 #include <time.h>
 #include <fstream>
 #include <string>
+#include <windows.h>
 using namespace std;
 clock_t clock(void);
 void main()
 {
     cout << "Liquid - Water, Gas - air" << endl;
     cout << endl;
-    int M1 = 300; // число точек по z
-    int M2 = 30; // число точек по r
+    int M1 = 500; // число точек по z
+    int M2 = 100; // число точек по r
     //описание динамических массивов
     cout << "Fill arrays" << endl;
     double** T_g = new double* [M1 + 1];
@@ -117,7 +118,7 @@ void main()
     //конец описания динамических массивов
     cout << "Arrays are full" << endl;
     cout << endl;
-    double P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
+    double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
     double V_liquid = 1e-6, ro_g = 1.2, ro_liq0 = 1000., yota = 1.4, lambda = 2.59 * 1e-2;
     double K_g = lambda / (c_g * ro_g);
     for (int I = 0; I <= M1; I++)
@@ -145,18 +146,25 @@ void main()
     for (int I = 0; I <= M1; I++)
         for (int J = 0; J <= M2; J++)
         {
-            alpha[I][J] = 1.e-2;
+            if (J <= 30)
+                alpha[I][J] = 1.e-2;
+            else 
+                alpha[I][J] = 1.e-7;
             RO[I][J] = alpha[I][J] * ro_g + (1 - alpha[I][J]) * ro_liq0;
             RO0[I][J] = alpha[I][J] * ro_g + (1 - alpha[I][J]) * ro_liq0;
             Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
+            if (Cb[I][J] > C_liq) { Cb[I][J] = C_liq; }
         }
-    for (int I = 0; I <= M1; I++) { alpha[I][0] = alpha[I][1]; }
     double T = 0.0;
     int K = 0;
     int numer = 1;
     int numer1 = 1;
-    ofstream FileDeltaP_liq;
-    FileDeltaP_liq.open("PL-1-50-100-150-200-250-300.txt");
+    ofstream FileDeltaP_liqR1;
+    FileDeltaP_liqR1.open("PLR1-1-50-100-150-200-250-300.txt");
+    ofstream FileDeltaP_liqR100;
+    FileDeltaP_liqR100.open("PLR100-1-50-100-150-200-250-300.txt");
+    ofstream Alpha;
+    Alpha.open("alpha.txt");
     ofstream FileP_liq;
     FileP_liq.open("P.txt");
     while (K <= 50000)
@@ -169,11 +177,12 @@ void main()
         double TZ = TZR1 / 2.;
         double ZN11 = 1. / (sqrt(4.0 * log(10.)));
         double ZN1 = TZ * ZN11;
-        if ((T < TZR1))
+        if ((T < TZR1 / 2.0))
         {
             for (int J = 0; J <= M2; J++)
             {
                 P_liq[0][J] = P_0 + delta_P_liq * exp(-((T - TZ) / (ZN1)) * ((T - TZ) / (ZN1)));
+                //P_liq[0][J] = P_0 + delta_P_liq;
             }
         }
         else
@@ -183,14 +192,34 @@ void main()
         for (int I = 1; I <= M1 - 1; I++)
             for (int J = 1; J <= M2 - 1; J++)
             {      
-                Jakobian[I][J] = (R[I][J] / (J * hR)) * ((R[I][J + 1] - R[I][J]) * (Z[I + 1][J] - Z[I][J]) / (hR * hZ) -
-                    (R[I + 1][J] - R[I][J]) * (Z[I][J + 1] - Z[I][J]) / (hR * hZ));
-                NEW_Vz[I][J] = Vz[I][J] + (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
-                    (((P_liq[I][J] - P_liq[I][J - 1]) / (hR)) * ((R[I + 1][J] - R[I][J]) / (hZ)) -
-                        ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ)) * ((R[I][J + 1] - R[I][J]) / (hR)));
-                NEW_Vr[I][J] = Vr[I][J] - (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
-                    (R[I][J] / ((J)*hR)) * (((P_liq[I][J] - P_liq[I][J - 1]) / (hR)) * ((Z[I + 1][J] - Z[I][J]) / (hZ)) -
-                        ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ)) * ((Z[I][J + 1] - Z[I][J]) / (hR)));
+                if (J == 1)
+                {
+                    Jakobian[I][J] = (Z[I + 1][J] - Z[I][J]) / hZ;
+                    NEW_Vr[I][J] = 0;
+                    NEW_Vz[I][J] = Vz[I][J] - (tau / (RO[I][J] * Jakobian[I][J])) * ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ));
+                }
+                else
+                    if (J == M2)
+                    {
+                        Jakobian[I][J] = (R[I][J] / (J * hR)) * ((R[I][J] - R[I][J - 1]) * (Z[I + 1][J] - Z[I][J]) / (hR * hZ) -
+                            (R[I + 1][J] - R[I][J]) * (Z[I][J] - Z[I][J - 1]) / (hR * hZ));
+                            NEW_Vz[I][J] = Vz[I][J] + (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
+                            (((P_liq[I][J] - P_liq[I][J - 1]) / (hR)) * ((R[I + 1][J] - R[I][J]) / (hZ)) -
+                                ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ)) * ((R[I][J] - R[I][J - 1]) / (hR)));
+                        NEW_Vr[I][J] = 0;
+                    }
+                    else
+                        if (J != 1 && J != M2)
+                        {
+                            Jakobian[I][J] = (R[I][J] / (J * hR)) * ((R[I][J + 1] - R[I][J]) * (Z[I + 1][J] - Z[I][J]) / (hR * hZ) -
+                                (R[I + 1][J] - R[I][J]) * (Z[I][J + 1] - Z[I][J]) / (hR * hZ));
+                            NEW_Vz[I][J] = Vz[I][J] + (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
+                                (((P_liq[I][J] - P_liq[I][J - 1]) / (hR)) * ((R[I + 1][J] - R[I][J]) / (hZ)) -
+                                    ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ)) * ((R[I][J + 1] - R[I][J]) / (hR)));
+                            NEW_Vr[I][J] = Vr[I][J] - (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
+                                (R[I][J] / ((J)*hR)) * (((P_liq[I][J] - P_liq[I][J - 1]) / (hR)) * ((Z[I + 1][J] - Z[I][J]) / (hZ)) -
+                                    ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ)) * ((Z[I][J + 1] - Z[I][J]) / (hR)));
+                        }
                 NEW_Z[M1][J] = Z[M1][J] + tau * (Vz[M1][J]);
                 NEW_R[M1][J] = R[M1][J] + tau * (Vr[M1][J]);
             }
@@ -212,17 +241,34 @@ void main()
                 NEW_Z[M1][J] = Z[M1][J] + tau * (Vz[M1][J]);
                 NEW_R[I][M2] = R[I][M2] + tau * (Vr[I][M2]);
                 Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
-                Jakobian[I][J] = (Z[I + 1][J] - Z[I][J]) / (hZ);
-                DJ[I][J] = (NEW_Vz[I + 1][J] - NEW_Vz[I][J]) / (hZ)+(NEW_Z[I + 1][J] - NEW_Z[I][J]) * (NEW_Vr[I][J + 1] -
-                    NEW_Vr[I][J]) / (hZ * hR) - (NEW_Z[I][J + 1] - NEW_Z[I][J]) * (NEW_Vr[I + 1][J] - NEW_Vr[I][J]) / (hZ * hR);
-                DJak[I][J] = (NEW_Vr[I][J] * Jakobian[I][J] / (NEW_R[I][J])) + DJ[I][J];
+                if (Cb[I][J] > C_liq) { Cb[I][J] = C_liq; }
+                if (J == 1)
+                {
+                    Jakobian[I][J] = (Z[I + 1][J] - Z[I][J]) / (hZ);
+                    DJ[I][J] = (NEW_Vz[I + 1][J] - NEW_Vz[I][J]) / (hZ)+(NEW_Z[I + 1][J] -
+                        NEW_Z[I][J]) * (NEW_Vr[I][J + 1] - NEW_Vr[I][J]) / (hZ * hR) -
+                        (NEW_Z[I][J + 1] - NEW_Z[I][J]) * (NEW_Vr[I + 1][J] - NEW_Vr[I][J]) / (hZ * hR);
+                    DJak[I][J] = (NEW_Vr[I][J] * Jakobian[I][J] / (NEW_R[I][J])) + DJ[I][J];
+                }
+                else
+                    if (J != 1 && J != M2)
+                    {
+                        DJ[I][J] = ((NEW_Vz[I + 1][J] - NEW_Vz[I][J]) * (NEW_R[I][J + 1] - NEW_R[I][J]) +
+                            (NEW_Z[I + 1][J] - NEW_Z[I][J]) * (NEW_Vr[I][J + 1] - NEW_Vr[I][J]) -
+                            (NEW_Vz[I][J + 1] - NEW_Vz[I][J]) * (NEW_R[I + 1][J] - NEW_R[I][J]) -
+                            (NEW_Z[I][J + 1] - NEW_Z[I][J]) * (NEW_Vr[I + 1][J] - NEW_Vr[I][J])) / (hZ * hR);
+                        DJak[I][J] = (NEW_Vr[I][J] * Jakobian[I][J] / (R[I][J])) + (R[I][J] / (J * hR)) * DJ[I][J];
+                    }
+                NEW_alpha[I][J] = alpha[I][J] + tau * ((3 * alpha[I][J] * W[I][J] / A[I][J]) - DJak[I][J] * alpha[I][J] / Jakobian[I][J]);
                 NEW_P_liq[I][J] = P_liq[I][J] + (tau * Cb[I][J] * Cb[I][J] * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
                     (RO0[I][J] / (RO[I][J] * Jakobian[I][J] * Jakobian[I][J]) + alpha[I][J] / Jakobian[I][J])) / (1 - alpha[I][J]));
                 // задание условия жесткой стенки на границе z = Lz
-                Vz[M2-1][J] = 0;
+                //Vz[M2-1][J] = 0;
+                // задание условия неотражения на границе z = Lz
+                NEW_P_liq[M1 - 1][J] = (Cb[I][J] * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
             }
         for (int I = 1; I <= M1; I++) {
-            for (int J = 1; J <= M2; J++)
+            for (int J = 0; J <= M2; J++)
             {
                 Vr[I][J] = NEW_Vr[I][J];
                 Vz[I][J] = NEW_Vz[I][J];
@@ -230,9 +276,14 @@ void main()
                 A[I][J] = NEW_A[I][J];
                 W_R[I][J] = NEW_W_R[I][J];
                 P_g[I][J] = NEW_P_g[I][J];
+                alpha[I][J] = NEW_alpha[I][J];
                 Z[I][J] = NEW_Z[I][J];
                 R[I][J] = NEW_R[I][J];
             }
+        }
+        for (int J = 0; J <= M2; J++)
+        {
+            FileP_liq << K << "\t" << P_liq[0][J] << endl;
         }
         for (int I = 0; I <= M1 - 1; I++) { P_liq[I][0] = P_liq[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
@@ -241,7 +292,8 @@ void main()
                 if (J <= (M2)) { Pz[I][J] = P_liq[I][(M2)-J]; }
                 else if (J >= (M2)) { Pz[I][J] = P_liq[I][J - (M2)]; }
             }
-        FileDeltaP_liq << "\n" << K * tau << "\t" << (Pz[1][15] - P_0) << "\t" << (Pz[50][15] - P_0) << "\t" << (Pz[100][15] - P_0) << "\t" << (Pz[150][15] - P_0) << "\t" << (Pz[200][15] - P_0) << "\t" << (Pz[250][15] - P_0) << "\t" << (Pz[299][15] - P_0);
+        FileDeltaP_liqR1 << "\n" << K * tau << "\t" << (Pz[1][15]) << "\t" << (Pz[50][1]) << "\t" << (Pz[100][1]) << "\t" << (Pz[150][1]) << "\t" << (Pz[200][1]) << "\t" << (Pz[250][1]) << "\t" << (Pz[299][1]);
+        FileDeltaP_liqR100 << "\n" << K * tau << "\t" << (Pz[1][M2 - 1]) << "\t" << (Pz[50][M2 - 1]) << "\t" << (Pz[100][M2 - 1]) << "\t" << (Pz[150][M2 - 1]) << "\t" << (Pz[200][M2 - 1]) << "\t" << (Pz[250][M2 - 1]) << "\t" << (Pz[299][M2 - 1]);
         for (int I = 0; I <= M1 - 1; I++) { Vz[I][0] = Vz[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
             for (int J = (0); J <= 2 * (M2 - 1); J++)
@@ -256,6 +308,10 @@ void main()
                 if (J <= (M2 - 1)) { Vrz[I][J] = Vr[I][(M2 - 1) - J]; }
                 else if (J >= (M2 - 1)) { Vrz[I][J] = Vr[I][J - (M2 - 1)]; }
             }
+        if (K % 100 == 0) {
+            for (int I = 0; I < M1; I++)
+                Alpha << "\n" << K << "\t" << I << "\t" << "\t" << alpha[I][15];
+        }
         if (K % 10000 == 0)
         {
             string Name = "ZR";
@@ -264,11 +320,10 @@ void main()
             string FileName = Name + FileT + TXT;
             ofstream file;
             file.open(FileName);
-            for (int I = 0; I < M1; I++) {
-                for (int J = 1; J <= M2; J++)
+            for (int I = 1; I < M1; I++) {
+                for (int J = 1; J <= 2 * (M2 - 1); J++)
                 {
-                    file << "\n" << I * hZ << "\t" << -((M2)-J) * hR << "\t" << Pz[I][J] - P_0;
-                    FileP_liq << K << "\t" << P_liq[0][J] << endl;
+                    file << "\n" << I * hZ << "\t" << -((M2)-J)* hR << "\t" << Pz[I][J];
                 }
             }
             numer++;

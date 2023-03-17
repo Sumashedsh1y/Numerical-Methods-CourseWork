@@ -160,9 +160,9 @@ void main()
     int numer = 1;
     int numer1 = 1;
     ofstream FileDeltaP_liqR1;
-    FileDeltaP_liqR1.open("PLR1-1-50-100-150-200-250-300.txt");
+    FileDeltaP_liqR1.open("PLR1-1-100-200-300-400-500.txt");
     ofstream FileDeltaP_liqR100;
-    FileDeltaP_liqR100.open("PLR100-1-50-100-150-200-250-300.txt");
+    FileDeltaP_liqR100.open("PLR100-1-100-200-300-400-500.txt");
     ofstream Alpha;
     Alpha.open("alpha.txt");
     ofstream FileP_liq;
@@ -292,8 +292,8 @@ void main()
                 if (J <= (M2)) { Pz[I][J] = P_liq[I][(M2)-J]; }
                 else if (J >= (M2)) { Pz[I][J] = P_liq[I][J - (M2)]; }
             }
-        FileDeltaP_liqR1 << "\n" << K * tau << "\t" << (Pz[1][15]) << "\t" << (Pz[50][1]) << "\t" << (Pz[100][1]) << "\t" << (Pz[150][1]) << "\t" << (Pz[200][1]) << "\t" << (Pz[250][1]) << "\t" << (Pz[299][1]);
-        FileDeltaP_liqR100 << "\n" << K * tau << "\t" << (Pz[1][M2 - 1]) << "\t" << (Pz[50][M2 - 1]) << "\t" << (Pz[100][M2 - 1]) << "\t" << (Pz[150][M2 - 1]) << "\t" << (Pz[200][M2 - 1]) << "\t" << (Pz[250][M2 - 1]) << "\t" << (Pz[299][M2 - 1]);
+        FileDeltaP_liqR1 << "\n" << K * tau << "\t" << (Pz[1][15]) << "\t" << (Pz[100][1]) << "\t" << (Pz[200][1]) << "\t" << (Pz[300][1]) << "\t" << (Pz[400][1]) << "\t" << (Pz[499][1]);
+        FileDeltaP_liqR100 << "\n" << K * tau << "\t" << (Pz[1][M2 - 1]) << "\t" << (Pz[100][M2 - 1]) << "\t" << (Pz[200][M2 - 1]) << "\t" << (Pz[300][M2 - 1]) << "\t" << (Pz[400][M2 - 1]) << "\t" << (Pz[499][M2 - 1]);
         for (int I = 0; I <= M1 - 1; I++) { Vz[I][0] = Vz[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
             for (int J = (0); J <= 2 * (M2 - 1); J++)

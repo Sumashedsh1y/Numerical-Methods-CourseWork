@@ -227,7 +227,7 @@ void main()
             for (int J = 1; J <= M2 - 1; J++)
             {
                 T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (a0 * a0 * a0 * P_0);
-                W_A[I][J] =  (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
+                W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
                 W[I][J] = W_R[I][J] + W_A[I][J];
                 Pe[I][J] = 12. * (yota - 1.) * (T_0 * A[I][J] * fabs(W[I][J])) / (K_g * fabs(T_g[I][J] - (T_0 + 0.0000001)));
                 if (Pe[I][J] > 100.) { NU[I][J] = sqrt(Pe[I][J]); }

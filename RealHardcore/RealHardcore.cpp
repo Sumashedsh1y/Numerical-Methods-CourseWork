@@ -227,7 +227,7 @@ void main()
             for (int J = 1; J <= M2 - 1; J++)
             {
                 T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (a0 * a0 * a0 * P_0);
-                W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
+                W_A[I][J] =  (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
                 W[I][J] = W_R[I][J] + W_A[I][J];
                 Pe[I][J] = 12. * (yota - 1.) * (T_0 * A[I][J] * fabs(W[I][J])) / (K_g * fabs(T_g[I][J] - (T_0 + 0.0000001)));
                 if (Pe[I][J] > 100.) { NU[I][J] = sqrt(Pe[I][J]); }
@@ -259,13 +259,13 @@ void main()
                             (NEW_Z[I][J + 1] - NEW_Z[I][J]) * (NEW_Vr[I + 1][J] - NEW_Vr[I][J])) / (hZ * hR);
                         DJak[I][J] = (NEW_Vr[I][J] * Jakobian[I][J] / (R[I][J])) + (R[I][J] / (J * hR)) * DJ[I][J];
                     }
-                NEW_alpha[I][J] = alpha[I][J] + tau * ((3 * alpha[I][J] * W[I][J] / A[I][J]) - DJak[I][J] * alpha[I][J] / Jakobian[I][J]);
+                NEW_alpha[I][J] = alpha[I][J] + tau * ((3 * alpha[I][J] * W[I][J] / (A[I][J])) - DJak[I][J] * alpha[I][J] / Jakobian[I][J]);
                 NEW_P_liq[I][J] = P_liq[I][J] + (tau * C_liq * C_liq * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
                     (RO0[I][J] / (RO[I][J] * Jakobian[I][J] * Jakobian[I][J]) + alpha[I][J] / Jakobian[I][J])) / (1 - alpha[I][J]));
                 // задание условия жесткой стенки на границе z = Lz
-                //Vz[M2-1][J] = 0;
+                Vz[M2-1][J] = 0;
                 // задание условия неотражения на границе z = Lz
-                NEW_P_liq[M1 - 1][J] = (Cb[I][J] * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
+                //NEW_P_liq[M1 - 1][J] = (Cb[I][J] * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
             }
         for (int I = 1; I <= M1; I++) {
             for (int J = 0; J <= M2; J++)
@@ -314,7 +314,7 @@ void main()
                     Alpha << "\n" << I << "\t" << J << "\t" << alpha[I][J];
             }
         }
-        if (K % 1000 == 0)
+        if (K % 500 == 0)
         {
             string Name = "ZR";
             string FileT = to_string((K / 10000.0));

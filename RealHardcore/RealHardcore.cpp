@@ -167,7 +167,7 @@ void main()
     Alpha.open("alpha.txt");
     ofstream FileP_liq;
     FileP_liq.open("P.txt");
-    while (K <= 50000)
+    while (K <= 10000)
     {
         if ((ceil(K / 100) - numer1) == 0) { cout << "\n" << K; numer1++; }
         double T = K * tau;
@@ -227,7 +227,7 @@ void main()
             for (int J = 1; J <= M2 - 1; J++)
             {
                 T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (a0 * a0 * a0 * P_0);
-                W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * Cb[I][J] * pow(alpha[I][J], 1 / 3));
+                W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
                 W[I][J] = W_R[I][J] + W_A[I][J];
                 Pe[I][J] = 12. * (yota - 1.) * (T_0 * A[I][J] * fabs(W[I][J])) / (K_g * fabs(T_g[I][J] - (T_0 + 0.0000001)));
                 if (Pe[I][J] > 100.) { NU[I][J] = sqrt(Pe[I][J]); }
@@ -260,7 +260,7 @@ void main()
                         DJak[I][J] = (NEW_Vr[I][J] * Jakobian[I][J] / (R[I][J])) + (R[I][J] / (J * hR)) * DJ[I][J];
                     }
                 NEW_alpha[I][J] = alpha[I][J] + tau * ((3 * alpha[I][J] * W[I][J] / A[I][J]) - DJak[I][J] * alpha[I][J] / Jakobian[I][J]);
-                NEW_P_liq[I][J] = P_liq[I][J] + (tau * Cb[I][J] * Cb[I][J] * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
+                NEW_P_liq[I][J] = P_liq[I][J] + (tau * C_liq * C_liq * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
                     (RO0[I][J] / (RO[I][J] * Jakobian[I][J] * Jakobian[I][J]) + alpha[I][J] / Jakobian[I][J])) / (1 - alpha[I][J]));
                 // задание условия жесткой стенки на границе z = Lz
                 //Vz[M2-1][J] = 0;
@@ -308,14 +308,16 @@ void main()
                 if (J <= (M2 - 1)) { Vrz[I][J] = Vr[I][(M2 - 1) - J]; }
                 else if (J >= (M2 - 1)) { Vrz[I][J] = Vr[I][J - (M2 - 1)]; }
             }
-        if (K % 100 == 0) {
-            for (int I = 0; I < M1; I++)
-                Alpha << "\n" << K << "\t" << I << "\t" << "\t" << alpha[I][15];
+        if (K == 0) {
+            for (int I = 0; I < M1; I++) {
+                for (int J = 0; J < M2; J++)
+                    Alpha << "\n" << I << "\t" << J << "\t" << alpha[I][J];
+            }
         }
-        if (K % 10000 == 0)
+        if (K % 1000 == 0)
         {
             string Name = "ZR";
-            string FileT = to_string((int)(K / 10000));
+            string FileT = to_string((K / 10000.0));
             string TXT = "msec.txt";
             string FileName = Name + FileT + TXT;
             ofstream file;

@@ -203,7 +203,7 @@ void main()
                     {
                         Jakobian[I][J] = (R[I][J] / (J * hR)) * ((R[I][J] - R[I][J - 1]) * (Z[I + 1][J] - Z[I][J]) / (hR * hZ) -
                             (R[I + 1][J] - R[I][J]) * (Z[I][J] - Z[I][J - 1]) / (hR * hZ));
-                            NEW_Vz[I][J] = Vz[I][J] + (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
+                        NEW_Vz[I][J] = Vz[I][J] + (tau / (RO[I][J] * Jakobian[I][J])) * (R[I][J] / ((J)*hR)) *
                             (((P_liq[I][J] - P_liq[I][J - 1]) / (hR)) * ((R[I + 1][J] - R[I][J]) / (hZ)) -
                                 ((P_liq[I][J] - P_liq[I - 1][J]) / (hZ)) * ((R[I][J] - R[I][J - 1]) / (hR)));
                         NEW_Vr[I][J] = 0;
@@ -223,8 +223,8 @@ void main()
                 NEW_Z[M1][J] = Z[M1][J] + tau * (Vz[M1][J]);
                 NEW_R[M1][J] = R[M1][J] + tau * (Vr[M1][J]);
             }
-        for (int I = 1; I <= M1 - 1; I++)
-            for (int J = 1; J <= M2 - 1; J++)
+        for (int I = 1; I < M1; I++)
+            for (int J = 1; J <= M2; J++)
             {
                 T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (a0 * a0 * a0 * P_0);
                 W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
@@ -262,8 +262,9 @@ void main()
                 NEW_alpha[I][J] = alpha[I][J] + tau * ((3 * alpha[I][J] * W[I][J] / (A[I][J])) - DJak[I][J] * alpha[I][J] / Jakobian[I][J]);
                 NEW_P_liq[I][J] = P_liq[I][J] + (tau * C_liq * C_liq * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
                     (RO0[I][J] / (RO[I][J] * Jakobian[I][J] * Jakobian[I][J]) + alpha[I][J] / Jakobian[I][J])) / (1 - alpha[I][J]));
+
                 // задание условия жесткой стенки на границе z = Lz
-                Vz[M2-1][J] = 0;
+                Vz[M2][J] = 0;
                 // задание условия неотражения на границе z = Lz
                 //NEW_P_liq[M1 - 1][J] = (Cb[I][J] * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
             }

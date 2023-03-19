@@ -120,7 +120,10 @@ void main()
     cout << endl;
     double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
     double V_liquid = 1e-6, ro_g = 1.2, ro_liq0 = 1000., yota = 1.4, lambda = 2.59 * 1e-2;
+    //double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 595;
+    //double V_liquid = 6e-6, ro_g = 5.06, ro_liq0 = 1115., yota = 1.14, lambda = 0.97 * 1e-2;
     double K_g = lambda / (c_g * ro_g);
+    cout << K_g << endl;
     for (int I = 0; I <= M1; I++)
         for (int J = 0; J <= M2; J++)
         {
@@ -147,9 +150,9 @@ void main()
         for (int J = 0; J <= M2; J++)
         {
             if (J <= 30)
-                alpha[I][J] = 1.e-2;
+                alpha[I][J] = 1e-2;
             else 
-                alpha[I][J] = 1.e-7;
+                alpha[I][J] = 1e-8;
             RO[I][J] = alpha[I][J] * ro_g + (1 - alpha[I][J]) * ro_liq0;
             RO0[I][J] = alpha[I][J] * ro_g + (1 - alpha[I][J]) * ro_liq0;
             Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
@@ -167,7 +170,7 @@ void main()
     Alpha.open("alpha.txt");
     ofstream FileP_liq;
     FileP_liq.open("P.txt");
-    while (K <= 10000)
+    while (K <= 50000)
     {
         if ((ceil(K / 100) - numer1) == 0) { cout << "\n" << K; numer1++; }
         double T = K * tau;
@@ -262,11 +265,10 @@ void main()
                 NEW_alpha[I][J] = alpha[I][J] + tau * ((3 * alpha[I][J] * W[I][J] / (A[I][J])) - DJak[I][J] * alpha[I][J] / Jakobian[I][J]);
                 NEW_P_liq[I][J] = P_liq[I][J] + (tau * C_liq * C_liq * RO[I][J] * (3 * alpha[I][J] * W[I][J] / A[I][J] - DJak[I][J] *
                     (RO0[I][J] / (RO[I][J] * Jakobian[I][J] * Jakobian[I][J]) + alpha[I][J] / Jakobian[I][J])) / (1 - alpha[I][J]));
-
                 // задание условия жесткой стенки на границе z = Lz
-                Vz[M2][J] = 0;
+                //Vz[M2][J] = 0;
                 // задание условия неотражения на границе z = Lz
-                //NEW_P_liq[M1 - 1][J] = (Cb[I][J] * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
+                NEW_P_liq[M1 - 1][J] = (C_liq * ro_liq0) * (NEW_Vz[M1 - 1][J] - Vz[M1 - 1][J]) + P_liq[M1 - 1][J];
             }
         for (int I = 1; I <= M1; I++) {
             for (int J = 0; J <= M2; J++)

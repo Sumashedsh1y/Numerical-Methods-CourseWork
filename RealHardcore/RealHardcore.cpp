@@ -149,7 +149,7 @@ void main()
     for (int I = 0; I <= M1; I++)
         for (int J = 0; J <= M2; J++)
         {
-            if (J <= 30)
+            if (J > 30)
                 alpha[I][J] = 1e-2;
             else 
                 alpha[I][J] = 1e-8;

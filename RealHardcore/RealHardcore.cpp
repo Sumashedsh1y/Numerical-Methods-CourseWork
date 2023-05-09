@@ -149,7 +149,7 @@ void main()
     for (int I = 0; I <= M1; I++)
         for (int J = 0; J <= M2; J++)
         {
-            if (J > 30)
+            if (J >= 30)
                 alpha[I][J] = 1e-2;
             else 
                 alpha[I][J] = 1e-8;
@@ -162,10 +162,14 @@ void main()
     int K = 0;
     int numer = 1;
     int numer1 = 1;
-    ofstream FileDeltaP_liqR1;
-    FileDeltaP_liqR1.open("PLR1-1-100-200-300-400-500.txt");
-    ofstream FileDeltaP_liqR100;
-    FileDeltaP_liqR100.open("PLR100-1-100-200-300-400-500.txt");
+    /*for (int J = 0; J <= M2; J++) {
+        string Name = "PLR";
+        string FileT = to_string(J);
+        string TXT = "-1-100-200-300-400-500.txt";
+        string FileName = Name + FileT + TXT;
+        ofstream File;
+        File.open(FileName, ios::ate);
+    }*/
     ofstream Alpha;
     Alpha.open("alpha.txt");
     ofstream FileP_liq;
@@ -295,8 +299,15 @@ void main()
                 if (J <= (M2)) { Pz[I][J] = P_liq[I][(M2)-J]; }
                 else if (J >= (M2)) { Pz[I][J] = P_liq[I][J - (M2)]; }
             }
-        FileDeltaP_liqR1 << "\n" << K * tau << "\t" << (Pz[1][15]) << "\t" << (Pz[100][1]) << "\t" << (Pz[200][1]) << "\t" << (Pz[300][1]) << "\t" << (Pz[400][1]) << "\t" << (Pz[499][1]);
-        FileDeltaP_liqR100 << "\n" << K * tau << "\t" << (Pz[1][M2 - 1]) << "\t" << (Pz[100][M2 - 1]) << "\t" << (Pz[200][M2 - 1]) << "\t" << (Pz[300][M2 - 1]) << "\t" << (Pz[400][M2 - 1]) << "\t" << (Pz[499][M2 - 1]);
+        /*for (int J = 0; J <= M2; J++) {
+            string Name = "PLR";
+            string FileT = to_string(J);
+            string TXT = "-1-100-200-300-400-500.txt";
+            string FileName = Name + FileT + TXT;
+            ofstream File;
+            File.open(FileName, ios::out | ios::app);
+            File << "\n" << K * tau << "\t" << (Pz[1][J]) << "\t" << (Pz[100][J]) << "\t" << (Pz[200][J]) << "\t" << (Pz[300][J]) << "\t" << (Pz[400][J]) << "\t" << (Pz[499][J]);
+        }*/
         for (int I = 0; I <= M1 - 1; I++) { Vz[I][0] = Vz[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
             for (int J = (0); J <= 2 * (M2 - 1); J++)
@@ -317,7 +328,7 @@ void main()
                     Alpha << "\n" << I << "\t" << J << "\t" << alpha[I][J];
             }
         }
-        if (K % 500 == 0)
+        if (K % 1000 == 0)
         {
             string Name = "ZR";
             string FileT = to_string((K / 10000.0));
@@ -330,6 +341,15 @@ void main()
                 {
                     file << "\n" << I * hZ << "\t" << -((M2)-J)* hR << "\t" << Pz[I][J];
                 }
+            }
+            string Name_ = "PL_Z_";
+            string FileT_ = to_string((K / 10000.0));
+            string TXT_ = "msec.txt";
+            string FileName_ = Name_ + FileT_ + TXT_;
+            ofstream file_;
+            file_.open(FileName_);
+            for (int I = 1; I < M1; I++) {
+                file_ << "\n" << I * hZ << "\t" << Pz[I][1] << "\t" << Pz[I][M2 - 1];
             }
             numer++;
         }

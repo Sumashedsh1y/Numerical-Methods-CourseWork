@@ -6,123 +6,125 @@
 #include <fstream>
 #include <string>
 #include <windows.h>
+#include <limits>
 using namespace std;
 clock_t clock(void);
 void main()
 {
     cout << "Liquid - Water, Gas - air" << endl;
     cout << endl;
+    //int M1 = 1000; // число точек по z
     int M1 = 500; // число точек по z
     int M2 = 100; // число точек по r
     //описание динамических массивов
     cout << "Fill arrays" << endl;
-    double** T_g = new double* [M1 + 1];
-    for (int i = 0; i < M1 + 1; i++) T_g[i] = new double[M2 + 1];
+    long double** T_g = new long double* [M1 + 1];
+    for (int i = 0; i < M1 + 1; i++) T_g[i] = new long double[M2 + 1];
     cout << "Array T_g filled" << endl;
-    double** P_liq = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) P_liq[i] = new double[M2 + 1];
+    long double** P_liq = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) P_liq[i] = new long double[M2 + 1];
     cout << "Array P_liq filled" << endl;
-    double** Q = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Q[i] = new double[M2 + 1];
+    long double** Q = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Q[i] = new long double[M2 + 1];
     cout << "Array Q filled" << endl;
-    double** W_A = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) W_A[i] = new double[M2 + 1];
+    long double** W_A = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) W_A[i] = new long double[M2 + 1];
     cout << "Array W_A filled" << endl;
-    double** W = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) W[i] = new double[M2 + 1];
+    long double** W = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) W[i] = new long double[M2 + 1];
     cout << "Array W filled" << endl;
-    double** Jakobian = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Jakobian[i] = new double[M2 + 1];
+    long double** Jakobian = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Jakobian[i] = new long double[M2 + 1];
     cout << "Array Jakobian filled" << endl;
-    double** NEW_Vz = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_Vz[i] = new double[M2 + 1];
+    long double** NEW_Vz = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_Vz[i] = new long double[M2 + 1];
     cout << "Array New_Vz filled" << endl;
-    double** NEW_Vr = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_Vr[i] = new double[M2 + 1];
+    long double** NEW_Vr = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_Vr[i] = new long double[M2 + 1];
     cout << "Array New_Vr filled" << endl;
-    double** NEW_P_liq = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_P_liq[i] = new double[M2 + 1];
+    long double** NEW_P_liq = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_P_liq[i] = new long double[M2 + 1];
     cout << "Array New_PL filled" << endl;
-    double** NEW_Z = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_Z[i] = new double[M2 + 1];
+    long double** NEW_Z = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_Z[i] = new long double[M2 + 1];
     cout << "Array New_Z filled" << endl;
-    double** NEW_R = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_R[i] = new double[M2 + 1];
+    long double** NEW_R = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_R[i] = new long double[M2 + 1];
     cout << "Array New_R filled" << endl;
-    double** Vz = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Vz[i] = new double[M2 + 1];
+    long double** Vz = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Vz[i] = new long double[M2 + 1];
     cout << "Array Vz filled" << endl;
-    double** Vr = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Vr[i] = new double[M2 + 1];
+    long double** Vr = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Vr[i] = new long double[M2 + 1];
     cout << "Array Vr filled" << endl;
-    double** Z = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Z[i] = new double[M2 + 1];
+    long double** Z = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Z[i] = new long double[M2 + 1];
     cout << "Array Z filled" << endl;
-    double** R = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) R[i] = new double[M2 + 1];
+    long double** R = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) R[i] = new long double[M2 + 1];
     cout << "Array R filled" << endl;
-    double** Pe = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Pe[i] = new double[M2 + 1];
+    long double** Pe = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Pe[i] = new long double[M2 + 1];
     cout << "Array Pe filled" << endl;
-    double** NU = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NU[i] = new double[M2 + 1];
+    long double** NU = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NU[i] = new long double[M2 + 1];
     cout << "Array Nu filled" << endl;
-    double** A = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) A[i] = new double[M2 + 1];
+    long double** A = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) A[i] = new long double[M2 + 1];
     cout << "Array A filled" << endl;
-    double** W_R = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) W_R[i] = new double[M2 + 1];
+    long double** W_R = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) W_R[i] = new long double[M2 + 1];
     cout << "Array w_r filled" << endl;
-    double** P_g = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) P_g[i] = new double[M2 + 1];
+    long double** P_g = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) P_g[i] = new long double[M2 + 1];
     cout << "Array P_g filled" << endl;
-    double** alpha = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) alpha[i] = new double[M2 + 1];
+    long double** alpha = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) alpha[i] = new long double[M2 + 1];
     cout << "Array Alfa filled" << endl;
-    double** NEW_A = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_A[i] = new double[M2 + 1];
+    long double** NEW_A = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_A[i] = new long double[M2 + 1];
     cout << "Array New_A filled" << endl;
-    double** NEW_W_R = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_W_R[i] = new double[M2 + 1];
+    long double** NEW_W_R = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_W_R[i] = new long double[M2 + 1];
     cout << "Array New_W_R filled" << endl;
-    double** NEW_P_g = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_P_g[i] = new double[M2 + 1];
+    long double** NEW_P_g = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_P_g[i] = new long double[M2 + 1];
     cout << "Array New_P_G filled" << endl;
-    double** NEW_alpha = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) NEW_alpha[i] = new double[M2 + 1];
+    long double** NEW_alpha = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) NEW_alpha[i] = new long double[M2 + 1];
     cout << "Array New_Alfa filled" << endl;
-    double** DJak = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) DJak[i] = new double[M2 + 1];
+    long double** DJak = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) DJak[i] = new long double[M2 + 1];
     cout << "Array DJak filled" << endl;
-    double** DJ = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) DJ[i] = new double[M2 + 1];
+    long double** DJ = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) DJ[i] = new long double[M2 + 1];
     cout << "Array DJ filled" << endl;
-    double** RO0 = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) RO0[i] = new double[M2 + 1];
+    long double** RO0 = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) RO0[i] = new long double[M2 + 1];
     cout << "Array Ro0 filled" << endl;
-    double** RO = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) RO[i] = new double[M2 + 1];
+    long double** RO = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) RO[i] = new long double[M2 + 1];
     cout << "Array Ro filled" << endl;
-    double** Cb = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Cb[i] = new double[M2 + 1];
+    long double** Cb = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Cb[i] = new long double[M2 + 1];
     cout << "Array Cb filled" << endl;
-    double** Pz = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Pz[i] = new double[2 * (M2 + 1)];
+    long double** Pz = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Pz[i] = new long double[2 * (M2 + 1)];
     cout << "Array Pz filled" << endl;
-    double** Vzz = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Vzz[i] = new double[2 * (M2 + 1)];
+    long double** Vzz = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Vzz[i] = new long double[2 * (M2 + 1)];
     cout << "Array Vzz filled" << endl;
-    double** Vrz = new double* [M1 + 1]; //
-    for (int i = 0; i < M1 + 1; i++) Vrz[i] = new double[2 * (M2 + 1)];
+    long double** Vrz = new long double* [M1 + 1]; //
+    for (int i = 0; i < M1 + 1; i++) Vrz[i] = new long double[2 * (M2 + 1)];
     cout << "Array Vrz filled" << endl;
     //конец описания динамических массивов
     cout << "Arrays are full" << endl;
     cout << endl;
-    double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
-    double V_liquid = 1e-6, ro_g = 1.2, ro_liq0 = 1000., yota = 1.4, lambda = 2.59 * 1e-2;
-    //double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 595;
-    //double V_liquid = 6e-6, ro_g = 5.06, ro_liq0 = 1115., yota = 1.14, lambda = 0.97 * 1e-2;
-    double K_g = lambda / (c_g * ro_g);
+    long double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 1003;
+    long double V_liquid = 1e-6, ro_g = 1.2, ro_liq0 = 1000., yota = 1.4, lambda = 2.59 * 1e-2;
+    //long double C_liq = 1500., P_0 = 1.e+5, hZ = 1.e-3, hR = 1.e-3, tau = 1.e-7, T_0 = 293., a0 = 1.e-3, c_g = 595;
+    //long double V_liquid = 6e-6, ro_g = 5.06, ro_liq0 = 1115., yota = 1.14, lambda = 0.97 * 1e-2;
+    long double K_g = lambda / (c_g * ro_g);
     cout << K_g << endl;
     for (int I = 0; I <= M1; I++)
         for (int J = 0; J <= M2; J++)
@@ -149,7 +151,8 @@ void main()
     for (int I = 0; I <= M1; I++)
         for (int J = 0; J <= M2; J++)
         {
-            if (J >= 30)
+            //if (I >= 500 && I <= 600 && J >= 10)
+            if (((I-250)*(I-250)+J*J) <= 2500)
                 alpha[I][J] = 1e-2;
             else 
                 alpha[I][J] = 1e-8;
@@ -158,7 +161,7 @@ void main()
             Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
             if (Cb[I][J] > C_liq) { Cb[I][J] = C_liq; }
         }
-    double T = 0.0;
+    long double T = 0.0;
     int K = 0;
     int numer = 1;
     int numer1 = 1;
@@ -174,16 +177,16 @@ void main()
     Alpha.open("alpha.txt");
     ofstream FileP_liq;
     FileP_liq.open("P.txt");
-    while (K <= 50000)
+    while (K <= 10000)
     {
         if ((ceil(K / 100) - numer1) == 0) { cout << "\n" << K; numer1++; }
-        double T = K * tau;
-        double delta_P_liq = 5.e+5; // 0.5МПа
+        long double T = K * tau;
+        long double delta_P_liq = 3.e+5; // 0.5МПа
         T = K * tau;
-        double TZR1 = 2.E-4;
-        double TZ = TZR1 / 2.;
-        double ZN11 = 1. / (sqrt(4.0 * log(10.)));
-        double ZN1 = TZ * ZN11;
+        long double TZR1 = 2.E-4;
+        long double TZ = TZR1 / 2.;
+        long double ZN11 = 1. / (sqrt(4.0 * log(10.)));
+        long double ZN1 = TZ * ZN11;
         if ((T < TZR1 / 2.0))
         {
             for (int J = 0; J <= M2; J++)
@@ -233,7 +236,7 @@ void main()
         for (int I = 1; I < M1; I++)
             for (int J = 1; J <= M2; J++)
             {
-                T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (a0 * a0 * a0 * P_0);
+                T_g[I][J] = (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) / (P_0 * a0 * a0 * a0);
                 W_A[I][J] = (P_g[I][J] - P_liq[I][J]) / (ro_liq0 * C_liq * pow(alpha[I][J], 1 / 3));
                 W[I][J] = W_R[I][J] + W_A[I][J];
                 Pe[I][J] = 12. * (yota - 1.) * (T_0 * A[I][J] * fabs(W[I][J])) / (K_g * fabs(T_g[I][J] - (T_0 + 0.0000001)));
@@ -245,6 +248,28 @@ void main()
                     1.5 * (W_R[I][J] * W_R[I][J]) - 4 * V_liquid * W_R[I][J] / A[I][J]) / A[I][J]);
                 NEW_P_g[I][J] = P_g[I][J] - (tau * (3 * yota * P_g[I][J] * W[I][J]
                     + (3 * (yota - 1) * Q[I][J])) / A[I][J]);
+
+                if (isinf(NEW_P_g[I][J])) {
+                    cout << "I = " << I << "J = " << J << endl;
+                    cout << "Nu = " << NU[I][J] << endl;
+                    cout << "T_g = " << T_g[I][J] << endl;
+                    cout << "A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0 = " << (A[I][J] * A[I][J] * A[I][J] * P_g[I][J] * T_0) << endl;
+                    cout << "A[I][J] * A[I][J] * A[I][J] = " << A[I][J] * A[I][J] * A[I][J] << endl;
+                    cout << "Vr = " << Vr[I][J] << endl;
+                    cout << "Vz = " << Vz[I][J] << endl;
+                    cout << "A = " << A[I][J] << endl;
+                    cout << "Wr = " << W_A[I][J] << endl;
+                    cout << "Wa = " << W_R[I][J] << endl;
+                    cout << "W = " << W[I][J] << endl;
+                    cout << "Q = " << Q[I][J] << endl;
+                    cout << "P_g = " << P_g[I][J] << endl;
+                    cout << "alpha = " << alpha[I][J] << endl;
+                    cout << "DJ = " << DJ[I][J] << endl;
+                    cout << "DJak = " << DJak[I][J] << endl;
+                    cout << "Jakobian = " << Jakobian[I][J] << endl;
+                    getchar();
+                }
+
                 NEW_Z[M1][J] = Z[M1][J] + tau * (Vz[M1][J]);
                 NEW_R[I][M2] = R[I][M2] + tau * (Vr[I][M2]);
                 Cb[I][J] = sqrt(yota * P_0 / (alpha[I][J] * ro_liq0));
@@ -299,15 +324,17 @@ void main()
                 if (J <= (M2)) { Pz[I][J] = P_liq[I][(M2)-J]; }
                 else if (J >= (M2)) { Pz[I][J] = P_liq[I][J - (M2)]; }
             }
-        /*for (int J = 0; J <= M2; J++) {
+        for (int J = 0; J <= M2; J++) {
             string Name = "PLR";
             string FileT = to_string(J);
-            string TXT = "-1-100-200-300-400-500.txt";
+            //string TXT = "-200-550-800.txt";
+            string TXT = "-100-250-400.txt";
             string FileName = Name + FileT + TXT;
             ofstream File;
             File.open(FileName, ios::out | ios::app);
-            File << "\n" << K * tau << "\t" << (Pz[1][J]) << "\t" << (Pz[100][J]) << "\t" << (Pz[200][J]) << "\t" << (Pz[300][J]) << "\t" << (Pz[400][J]) << "\t" << (Pz[499][J]);
-        }*/
+            //File << "\n" << K * tau << "\t" << (Pz[200][J]) << "\t" << (Pz[550][J])  << "\t" << (Pz[800][J]);
+            File << "\n" << K * tau << "\t" << (Pz[100][J]) << "\t" << (Pz[250][J]) << "\t" << (Pz[400][J]);
+        }
         for (int I = 0; I <= M1 - 1; I++) { Vz[I][0] = Vz[I][1]; }
         for (int I = 0; I <= M1 - 1; I++)
             for (int J = (0); J <= 2 * (M2 - 1); J++)
@@ -328,7 +355,7 @@ void main()
                     Alpha << "\n" << I << "\t" << J << "\t" << alpha[I][J];
             }
         }
-        if (K % 1000 == 0)
+        if (K % 200 == 0)
         {
             string Name = "ZR";
             string FileT = to_string((K / 10000.0));
